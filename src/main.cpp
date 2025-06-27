@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
 const int adcPin = 3; // ADC pin for voltage measurement
-const int samples = 1000;
+const int samples = 100;
 const int intervalMs = 7000; // 50 ms
-const int sample_interval = 1; //1 ms
+const int sample_interval = 10; //1 ms
 
 float initialTemp = 0;
 float initialVolt = 0;
@@ -15,14 +15,14 @@ void voltageStatus(float voltage) {
 }
 
 float voltage_measure() {
-  float sum = 0;
+  float alpha = 0.1;
+  float filteredVoltage = 0;
   for (int i = 0; i < samples; i++) {
     int adcValue = analogReadMilliVolts(adcPin);
-    float voltage = ((float)adcValue);
-    sum += voltage;
+    filteredVoltage = alpha* adcValue + (1-alpha) * filteredVoltage;
     delay(sample_interval);
   }
-  return sum/samples;
+  return filteredVoltage;
 }
 
 float measureTemperatureAverage() {
