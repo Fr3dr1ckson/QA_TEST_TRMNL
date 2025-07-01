@@ -2,7 +2,7 @@
 
 const int adcPin = 3; // ADC pin for voltage measurement
 const int samples = 1000;
-const int intervalMs = 7000; // 50 ms
+const int intervalMs = 7000; // 7s
 const int sample_interval = 1; //1 ms
 
 float initialTemp = 0;
@@ -31,10 +31,10 @@ void Main_Test(){
   Serial.print("Temperature difference: ");
   Serial.println(last_temp-initial_temp);
   if(last_temp-initial_temp>2){
-    Serial.print("Test passedd: True");
+    Serial.print("Test passed: True");
   }
   else{
-    Serial.print("Test passedd: False");
+    Serial.print("Test passed: False");
   }
 }
 
