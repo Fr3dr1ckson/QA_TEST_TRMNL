@@ -2,28 +2,12 @@
 
 const int adcPin = 3; // ADC pin for voltage measurement
 const int samples = 1000;
-const int intervalMs = 7000; // 50 ms
+const int intervalMs = 7000; // 7s
 const int sample_interval = 1; //1 ms
 
 float initialTemp = 0;
-float initialVolt = 0;
 
-void voltageStatus(float voltage) {
-  if (voltage > 4.2) {
-    Serial.println("BATTERY EITHER FULL CHARGED OR NOT CONNECTED, PLEASE CHECK IF DEVICE MEETS ALL THE SPECIFIED CONDITIONS");
-  }
-}
 
-float voltage_measure() {
-  float sum = 0;
-  for (int i = 0; i < samples; i++) {
-    int adcValue = analogReadMilliVolts(adcPin);
-    float voltage = ((float)adcValue);
-    sum += voltage;
-    delay(sample_interval);
-  }
-  return sum/samples;
-}
 
 float measureTemperatureAverage() {
   float sum = 0;
@@ -35,74 +19,35 @@ float measureTemperatureAverage() {
 }
 
 void Main_Test(){
-  float initial_voltage = voltage_measure();
   float initial_temp = measureTemperatureAverage();
   Serial.print("Initial temperature: ");
   Serial.print(initial_temp, 3);
   Serial.println(" °C"); 
-  Serial.print("Initial voltage: ");
-  Serial.print(initial_voltage, 3);
-  Serial.println(" V"); 
   delay(intervalMs);
-  float last_voltage = voltage_measure();
   float last_temp = measureTemperatureAverage();
   Serial.print("Last temperature: ");
   Serial.print(last_temp, 3);
   Serial.println(" °C"); 
-  Serial.print("Last voltage: ");
-  Serial.print(last_voltage, 3);
-  Serial.println(" V"); 
-  Serial.print("Voltage difference: ");
-  Serial.println(last_voltage - initial_voltage);
   Serial.print("Temperature difference: ");
   Serial.println(last_temp-initial_temp);
-}
-float Voltage_Test() {
-  float sum = 0;
-  Serial.println("Measuring voltage (100 samples in 5 seconds)...");
-  for (int i = 0; i < samples; i++) {
-    float voltage = voltage_measure();
-    sum += voltage;
-    Serial.print("Sample ");
-    Serial.print(i + 1);
-    Serial.print(": ");
-    Serial.print(voltage, 3);
-    Serial.println(" V");
-    delay(intervalMs);
+  if(last_temp-initial_temp>2){
+    Serial.print("Test passed: True");
   }
-  float average = sum / samples;
-  Serial.print("Average voltage: ");
-  Serial.print(average, 3);
-  Serial.println(" V"); 
-  voltageStatus(average);
-
- 
-   {
-    if (average > initialVolt + 0.01) {
-      Serial.println("Battery voltage has increased by");
-      Serial.print((average-initialVolt-0.01));
-      Serial.print(" since startup");
-    } else if (average < initialVolt - 0.01) {
-      Serial.println("Battery voltage has decreased by");
-      Serial.print(initialVolt-average-0.01);
-      Serial.print(" since startup");
-    } else {
-      Serial.println("Battery voltage unchanged since startup.");
-    }
+  else{
+    Serial.print("Test passed: False");
   }
-  return average;
 }
-
-
-
 
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
-  Serial.println("ESP32-C3 Serial Command Example. Type 'TEMP' or 'VOLT' to start.");
+  for(int i = 0;i<10;i++){
+    analogRead(adcPin);
+    delay(10);
+  }
+  Serial.println("ESP32-C3 Serial Command Example. Type MAIN' to re-run script");
 
-  // Take initial measurements
   Main_Test();
 
 }
@@ -145,14 +90,10 @@ void loop() {
     command.trim();
     command.toUpperCase();
 
-    if (command == "TEMP") {
-      measureTemp();
-    } else if (command == "VOLT") {
-      Voltage_Test();
-    } else if (command == "MAIN"){
+    if (command == "MAIN"){
       Main_Test();
     }else {
-      Serial.println("Unknown command. Type 'TEMP' or 'VOLT'.");
+      Serial.println("Unknown command. Type MAIN");
     }
     while (Serial.available()) Serial.read();
   }
