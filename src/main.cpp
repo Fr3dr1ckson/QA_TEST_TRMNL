@@ -30,7 +30,7 @@ void Main_Test(){
   Serial.println(" °C"); 
   Serial.print("Temperature difference: ");
   Serial.println(last_temp-initial_temp);
-  if(last_temp-initial_temp>2){
+  if(last_temp-initial_temp<2){
     Serial.print("Test passed: True");
   }
   else{
