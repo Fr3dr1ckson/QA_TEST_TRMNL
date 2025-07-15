@@ -4,6 +4,7 @@ const int adcPin = 3; // ADC pin for voltage measurement
 const int samples = 1000;
 const int intervalMs = 7000; // 7s
 const int sample_interval = 1; //1 ms
+const int temperature_threshold = 35; // 35 by Celsium
 
 float initialTemp = 0;
 
@@ -18,8 +19,11 @@ float measureTemperatureAverage() {
   return sum / samples;
 }
 
-void Main_Test(){
+bool Main_Test(){
   float initial_temp = measureTemperatureAverage();
+  if (initial_temp > temperature_threshold){
+    return false;
+  }
   Serial.print("Initial temperature: ");
   Serial.print(initial_temp, 3);
   Serial.println(" °C"); 
@@ -31,11 +35,9 @@ void Main_Test(){
   Serial.print("Temperature difference: ");
   Serial.println(last_temp-initial_temp);
   if(last_temp-initial_temp<2){
-    Serial.print("Test passed: True");
+    return true;
   }
-  else{
-    Serial.print("Test passed: False");
-  }
+    return false;
 }
 
 
@@ -48,7 +50,11 @@ void setup() {
   }
   Serial.println("ESP32-C3 Serial Command Example. Type MAIN' to re-run script");
 
-  Main_Test();
+  bool test_result = Main_Test();
+  if(test_result)
+    Serial.print("Test passed: true");
+  else
+    Serial.print("Test passed: false");
 
 }
 
